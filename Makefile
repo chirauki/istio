@@ -96,11 +96,11 @@ CONDITIONAL_HOST_MOUNTS+=--mount type=bind,source="$(HOME)/.kube",destination="/
 endif
 
 ENV_VARS:=
-ifdef HUB
-ENV_VARS+=-e HUB="$(HUB)"
-endif
-ifdef TAG
-ENV_VARS+=-e TAG="$(TAG)"
+DOCKER_ENV_VARS:=HUB TAG DOCKER_BUILD_VARIANTS
+ENV_VARS+=$(foreach var, $(DOCKER_ENV_VARS), $(if $(filter-out undefined,$(origin $(var))),-e $(var)="$($(var))"))
+
+ifdef DOCKER_BUILD_VARS
+ENV_VARS+=$(foreach var, $(DOCKER_BUILD_VARS), $(if $(filter-out undefined,$(origin $(var))),-e $(var)="$($(var))"))
 endif
 
 RUN = $(CONTAINER_CLI) run -t -i --sig-proxy=true -u $(UID):$(GID) --rm \
